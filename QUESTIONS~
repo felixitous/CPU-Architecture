@@ -1,0 +1,26 @@
+PROJECT 4 WRITE-UP
+------------------
+
+1) Briefly explain how you implemented comparison queries and how they affected your control block's signals (in a few sentences).
+
+Comparison queries, or specifically when to store into our %cr register, were handled by a demux after the ALU which would store the ALU output into a %cr register if the input was a CMPS or CMPU. This %cr register would hold that calculated value for future comparisons. That value would only be written to if there was a CMPS operation and that is handled by a mux. In the ALU during a comparison instruction, a 3-bit output would be returned that represented <, =, > between the two input sources in that respective order. Again, this 3-bit output is used in our CPU to evaluate future ?CQ comparison by a simple mux with the CQ bits from instruction as the selector and CQBOOL? as resulting comparison. The control block's signal was affected by the ?CQ bits of each instruction, since if the ?CQ comparison evaluated to false, the instruction would not be executed. This required us to change control block signals such as RegWrite?, jump?, link? and more signals to take into account if the compare instruction evaluated to false, such as having a demux to stop instruction execution if CQBOOL? evaluated to false. Essentially, we had to change our control block signals to halt instruction execution if any arbitrary ?CQ evaluated to false (or in our CPU, the CQBOOL?).
+
+2) Please list your control block's control signals, and briefly explain what each one does (in a sentence or less each).
+
+RegWrite - Determines whether the registers need to be updated when there is a need to write to them
+MemWrite - This determines whether or not we want to write to memory (i.e. store)
+Load (MemRead) - Determines whether a load from memory is occurring (this also controls the mux which determines whether we use a value from memory or straight from the ALU).
+CMP - Determines if the instruction is a type of comparison, which is used as a selector in our demux after the ALU. It will store the ALU output into the %cr when necessary
+jump? - determines if it is a valid jump and is used to see where in %pc to go to and continue operations from there (When a jump does occur, %pc does not get incremented but goes to the address the jump designates; does not need to change where the return address is)
+link? - determines if it is a valid link (op and comparisons) and is used in a mux to determine where the new return address should be
+CQBool? - determines whether the comparison was valid and the instruction should move on or be killed
+IMM? - determines whether to take the second value as an immediate or from a register
+
+
+3) What features (if any) of this assembly language do you like?
+
+I enjoy dealing with less things than what is required in MIPS but that only comes in handy when implementing the CPU. The compare register is something that is pretty amazing since it manages branches in a more logical manner similar to coding. 
+
+4) What features (if any) of this assembly language do you not like?
+
+I don't have a lot of strong opinions against this assembly language. It was interesting to play with. 
